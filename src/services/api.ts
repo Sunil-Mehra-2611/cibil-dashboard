@@ -52,3 +52,20 @@ export const authService = {
   forgotPassword: (email: string) => api.post('/auth/forgot-password', { email }),
   resetPassword: (data: any) => api.post('/auth/reset-password', data),
 };
+
+export const userService = {
+  getDashboardStats: () => api.get('/user/dashboard'),
+};
+
+export const adminService = {
+  getDashboardStats: () => api.get('/admin/dashboard'),
+  getLoginActivity: (params: { limit?: number; offset?: number } = {}) => 
+    api.get('/admin/login-activity', { params }),
+  getUsers: () => api.get('/admin/users'),
+  createUser: (data: any) => api.post('/admin/users', data),
+  updateUser: (userId: number, data: any) => api.patch(`/admin/users/${userId}`, data),
+  deleteUser: (userId: number) => api.delete(`/admin/users/${userId}`),
+  uploadFiles: (formData: FormData) => api.post('/upload/files', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
+};

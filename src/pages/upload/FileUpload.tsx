@@ -5,13 +5,19 @@ import { Button } from '../../components/common/Button';
 import { Table } from '../../components/common/Table';
 import { Badge } from '../../components/common/Button';
 import { cn } from '../../utils/cn';
+import { adminService } from '../../services/api';
 
 interface FileUploadState {
-  file1: File | null;
-  file2: File | null;
+  file1: File | null; // main_file
+  file2: File | null; // identity_file
   progress: number;
   status: 'idle' | 'uploading' | 'success' | 'error';
   message: string;
+  result?: {
+    records_inserted: number;
+    records_failed: number;
+    status: string;
+  };
 }
 
 const FileUpload: React.FC = () => {
@@ -47,29 +53,42 @@ const FileUpload: React.FC = () => {
     if (fileNum === 2 && file2Ref.current) file2Ref.current.value = '';
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (!uploadState.file1 || !uploadState.file2) {
       alert('Please select both files');
       return;
     }
 
-    setUploadState(prev => ({ ...prev, status: 'uploading', progress: 0 }));
+    setUploadState(prev => ({ ...prev, status: 'uploading', progress: 10, message: 'Preparing files...' }));
 
-    // Mock Upload Progress
-    let currentProgress = 0;
-    const interval = setInterval(() => {
-      currentProgress += 5;
-      setUploadState(prev => ({ ...prev, progress: currentProgress }));
+    try {
+      const formData = new FormData();
+      formData.append('main_file', uploadState.file1);
+      formData.append('identity_file', uploadState.file2);
 
-      if (currentProgress >= 100) {
-        clearInterval(interval);
-        setUploadState(prev => ({
-          ...prev,
-          status: 'success',
-          message: 'Files uploaded and processed successfully. Historical snapshot created.'
-        }));
-      }
-    }, 100);
+      setUploadState(prev => ({ ...prev, progress: 30, message: 'Uploading to server...' }));
+      
+      const response = await adminService.uploadFiles(formData);
+      
+      setUploadState(prev => ({
+        ...prev,
+        status: 'success',
+        progress: 100,
+        message: response.data.message || 'Upload completed successfully',
+        result: {
+          records_inserted: response.data.records_inserted,
+          records_failed: response.data.records_failed,
+          status: response.data.status
+        }
+      }));
+    } catch (err: any) {
+      setUploadState(prev => ({
+        ...prev,
+        status: 'error',
+        progress: 0,
+        message: err.response?.data?.message || err.message || 'Failed to upload files'
+      }));
+    }
   };
 
   const historyData = [
@@ -220,11 +239,35 @@ const FileUpload: React.FC = () => {
                 </div>
                 {uploadState.message && (
                   <div className={cn(
-                    "mt-4 p-4 rounded-lg text-sm flex items-start",
-                    uploadState.status === 'success' ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
+                    "mt-4 p-4 rounded-lg text-sm flex flex-col",
+                    uploadState.status === 'success' ? "bg-green-50 text-green-700 border border-green-100" : "bg-red-50 text-red-700 border border-red-100"
                   )}>
-                    <Info size={18} className="mr-2 shrink-0 mt-0.5" />
-                    {uploadState.message}
+                    <div className="flex items-start">
+                      <Info size={18} className="mr-2 shrink-0 mt-0.5" />
+                      <div className="flex flex-col">
+                        <span className="font-bold uppercase tracking-widest text-[10px] mb-1">Upload Status</span>
+                        <p className="font-medium">{uploadState.message}</p>
+                      </div>
+                    </div>
+                    
+                    {uploadState.status === 'success' && uploadState.result && (
+                      <div className="mt-4 grid grid-cols-3 gap-4 pt-4 border-t border-green-200/50">
+                        <div>
+                          <p className="text-[10px] font-black uppercase tracking-widest opacity-60">Inserted</p>
+                          <p className="text-lg font-black">{uploadState.result.records_inserted.toLocaleString()}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-black uppercase tracking-widest opacity-60">Failed</p>
+                          <p className="text-lg font-black">{uploadState.result.records_failed.toLocaleString()}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-black uppercase tracking-widest opacity-60">Status</p>
+                          <Badge variant={uploadState.result.status === 'partial' ? 'warning' : 'success'} className="mt-1">
+                            {uploadState.result.status}
+                          </Badge>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

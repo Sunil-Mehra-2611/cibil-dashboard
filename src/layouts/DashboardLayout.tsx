@@ -13,7 +13,8 @@ import {
   Bell,
   User as UserIcon,
   Search,
-  AlertTriangle
+  AlertTriangle,
+  ShieldCheck
 } from 'lucide-react';
 
 import { cn } from '../utils/cn';
@@ -32,7 +33,8 @@ const Sidebar = ({ isOpen, toggleSidebar }: { isOpen: boolean, toggleSidebar: ()
   if (user?.role === 'admin') {
     navItems.push(
       { name: 'File Upload', icon: Upload, path: '/upload' },
-      { name: 'User Management', icon: Settings, path: '/users' }
+      { name: 'User Management', icon: Settings, path: '/users' },
+      { name: 'Login Activity', icon: ShieldCheck, path: '/login-activity' }
     );
   }
 

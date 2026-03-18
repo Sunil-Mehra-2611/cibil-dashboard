@@ -16,6 +16,7 @@ import FileUpload from './pages/upload/FileUpload';
 import CustomerList from './pages/customer/CustomerList';
 import CustomerDetail from './pages/customer/CustomerDetail';
 import UserManagement from './pages/users/UserManagement';
+import LoginActivity from './pages/users/LoginActivity';
 import Reports from './pages/reports/Reports';
 
 const Unauthorized = () => (
@@ -68,6 +69,7 @@ const App: React.FC = () => {
             <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
               <Route path="/upload" element={<FileUpload />} />
               <Route path="/users" element={<UserManagement />} />
+              <Route path="/login-activity" element={<LoginActivity />} />
             </Route>
           </Route>
 
