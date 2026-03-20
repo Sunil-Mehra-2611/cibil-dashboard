@@ -10,7 +10,6 @@ import {
   LogOut,
   Menu,
   X,
-  Bell,
   User as UserIcon,
   Search,
   AlertTriangle,

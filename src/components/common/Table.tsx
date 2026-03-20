@@ -17,7 +17,6 @@ import {
   ChevronUp,
   ChevronsUpDown
 } from 'lucide-react';
-import { clsx } from 'clsx';
 
 import { cn } from '../../utils/cn';
 

@@ -13,14 +13,12 @@ import {
   History, 
   FileText,
   TrendingUp,
-  AlertTriangle,
   ExternalLink,
   Eye
 } from 'lucide-react';
 import { Card } from '../../components/common/Card';
 import { Button, Badge } from '../../components/common/Button';
 import { cn } from '../../utils/cn';
-import { clsx } from 'clsx';
 
 const CustomerDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
